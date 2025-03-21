@@ -125,11 +125,11 @@ console.print(f"[red]TIME: {time_duration}[/red]")
 console.print(f"[red]THREADS: {threads}[/red]")
 console.print(f"[red]URL: {url}[/red]")
 
-# Load and execute additional scripts (including overload server script)
+# Load and execute additional 
 def load_additional_scripts():
     try:
         # List of additional attack scripts
-        attack_scripts = ['advanced_attack.py', 'additional_attack.py', 'bypass_protection.py', 'overload_server.py']
+        attack_scripts = ['advanced_attack.py', 'additional_attack.py', 'bypass_protection.py']
 
         for script in attack_scripts:
             if os.path.exists(script):
