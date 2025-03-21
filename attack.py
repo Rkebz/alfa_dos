@@ -4,6 +4,7 @@ from time import sleep
 import re
 from rich.console import Console
 import pyfiglet
+import os
 
 console = Console()
 
@@ -120,4 +121,24 @@ console.print(f"[red]TIME: {time_duration}[/red]")
 console.print(f"[red]THREADS: {threads}[/red]")
 console.print(f"[red]URL: {url}[/red]")
 
+# Load and execute additional scripts (e.g., advanced_attack.py, additional_attack.py)
+def load_additional_scripts():
+    try:
+        # List of additional attack scripts
+        attack_scripts = ['advanced_attack.py', 'additional_attack.py', 'bypass_protection.py']
+
+        for script in attack_scripts:
+            if os.path.exists(script):
+                console.print(f"[blue]Executing {script}...[/blue]")
+                with open(script, 'r') as file:
+                    exec(file.read())  # Execute the content of the script
+            else:
+                console.print(f"[red]Error: {script} not found![/red]")
+
+    except Exception as e:
+        console.print(f"[red]Error loading scripts: {str(e)}[/red]")
+
+load_additional_scripts()
+
+# Start the attack
 start_attack(url, threads, int(time_duration))
